@@ -66,6 +66,18 @@ def _run(cmd, **kwargs):
 
 
 if not hermes_bin.exists():
+    # Check GitHub connectivity before attempting install (hermes is GitHub-only)
+    import urllib.request
+    try:
+        urllib.request.urlopen("https://api.github.com", timeout=3)
+        github_reachable = True
+    except Exception:
+        github_reachable = False
+
+    if not github_reachable:
+        print("GitHub unreachable — skipping Hermes install (not available in this network environment)")
+        import sys; sys.exit(0)
+
     print("Installing Hermes Agent from PyPI (minimal)...")
 
     install_cmd = ["uv", "tool", "install"]

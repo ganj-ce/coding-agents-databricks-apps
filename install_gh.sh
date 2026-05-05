@@ -3,6 +3,12 @@
 #
 # - Fetches the latest 2.x release from the GitHub API
 # - Installs to ~/.local/bin/gh.real
+
+# Skip if GitHub is unreachable (e.g. Databricks Apps network restrictions)
+if ! curl -sf --connect-timeout 3 "https://api.github.com" > /dev/null 2>&1; then
+    echo "GitHub unreachable — skipping gh CLI install"
+    exit 0
+fi
 # - Creates a wrapper at ~/.local/bin/gh that intercepts `gh auth login`
 #   to skip interactive prompts (arrow-key menus break in xterm.js PTY)
 

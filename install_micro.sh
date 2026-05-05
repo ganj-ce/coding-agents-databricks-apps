@@ -3,6 +3,12 @@
 # This script installs micro.
 #
 # Quick install: `curl https://getmic.ro | bash`
+
+# Skip if GitHub is unreachable (e.g. Databricks Apps network restrictions)
+if ! curl -sf --connect-timeout 3 "https://api.github.com" > /dev/null 2>&1; then
+    echo "GitHub unreachable — skipping micro install"
+    exit 0
+fi
 #
 # This script will install micro to the directory you're in. To install
 # somewhere else (e.g. /usr/local/bin), cd there and make sure you can write to

@@ -7,6 +7,12 @@
 
 set -euo pipefail
 
+# Skip if GitHub is unreachable (e.g. Databricks Apps network restrictions)
+if ! curl -sf --connect-timeout 3 "https://api.github.com" > /dev/null 2>&1; then
+    echo "GitHub unreachable — skipping Databricks CLI upgrade (using pre-installed version)"
+    exit 0
+fi
+
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"
 
