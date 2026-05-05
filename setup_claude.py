@@ -100,7 +100,21 @@ result = subprocess.run(
 if result.returncode == 0:
     print("Claude Code CLI installed successfully")
 else:
-    print(f"CLI install warning: {result.stderr}")
+    print(f"CLI install warning (will try bundled fallback): {result.stderr[:200]}")
+
+# Fallback: use the binary bundled inside claude_agent_sdk if curl install failed or
+# the binary still isn't present (e.g. outbound network blocked to claude.ai)
+if not claude_bin.exists():
+    import glob as _glob
+    bundled = _glob.glob(str(home / ".venv/lib/python*/site-packages/claude_agent_sdk/_bundled/claude"))
+    if not bundled:
+        bundled = _glob.glob("/app/python/source_code/.venv/lib/python*/site-packages/claude_agent_sdk/_bundled/claude")
+    if bundled:
+        local_bin.mkdir(parents=True, exist_ok=True)
+        claude_bin.symlink_to(bundled[0])
+        print(f"Claude Code CLI symlinked from bundled: {bundled[0]}")
+    else:
+        print("WARNING: Claude Code CLI not installed and no bundled binary found")
 
 # 4. Copy subagent definitions to ~/.claude/agents/
 # These enable TDD workflow: prd-writer → test-generator → implementer → build-feature
